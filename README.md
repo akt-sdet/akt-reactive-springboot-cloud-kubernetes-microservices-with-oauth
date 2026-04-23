@@ -1,17 +1,57 @@
 # ⚙️ Reactive Spring Boot Microservices with OAuth, Docker, and Kubernetes
 
-This project demonstrates a secure, reactive microservices architecture using Spring Boot, OAuth 2.0/OIDC, Docker, and Kubernetes. It includes API gateway routing, service discovery, message-based integration, and automated testing.
+## 🎯 Purpose
+
+This project was built to develop hands-on understanding of **distributed system behaviour from an engineering and testability perspective**.
+
+The goal was not just to build microservices, but to explore:
+- how services interact under normal and failure conditions  
+- how asynchronous messaging affects system behaviour  
+- how security boundaries (OAuth 2.0 / OIDC) influence system design  
+- how such systems can be **tested deterministically across layers**
+
+---
+
+## 🧠 System Overview
+
+The system models a typical microservices architecture:
+
+- API Gateway as the entry point  
+- Multiple backend services (product, review, recommendation)  
+- Service discovery and configuration management  
+- Asynchronous communication via Kafka and RabbitMQ  
+- Secure service-to-service interaction via OAuth 2.0 / OIDC  
+
+The focus is on **flow-based behaviour**, where requests propagate across services and result in durable system state.
 
 ![System Diagram](system-diagram.png)
 
+---
+
+## ⚠️ System Behaviour & Failure Scenarios
+
+This project explores realistic distributed system concerns:
+
+- **Transient failures** (timeouts, unavailable services)  
+- **Retry behaviour and recovery patterns**  
+- **Eventual consistency across asynchronous flows**  
+- **Message delivery and ordering considerations**  
+- **Security failures (invalid/expired tokens)**  
+
+These scenarios were used to understand:
+- how failures propagate across service boundaries  
+- how systems recover and stabilise  
+- how to design tests that remain reliable despite non-determinism  
+
+---
+
 ## 🚀 Tech Stack
 
-- **Spring Boot (WebFlux)** — Reactive microservices
-- **OAuth 2.0 + OIDC** — Secure authentication and token validation
-- **Docker & Docker Compose** — Containerized deployment
-- **Kubernetes-ready** — Modular structure for cloud-native orchestration
-- **RabbitMQ & Kafka** — Event and message-based communication
-- **Gradle Multi-Project** — Modular build and dependency management
+- **Spring Boot (WebFlux)** — Reactive microservices  
+- **OAuth 2.0 + OIDC** — Authentication and token validation  
+- **Docker & Docker Compose** — Containerised execution  
+- **Kafka & RabbitMQ** — Event-driven communication  
+- **Gradle Multi-Project** — Modular build structure  
 
 ---
 
@@ -19,8 +59,8 @@ This project demonstrates a secure, reactive microservices architecture using Sp
 
 | Folder | Description |
 |--------|-------------|
-| `api/` | API gateway and routing logic |
-| `microservices/` | Core services (e.g., product, review, recommendation) |
+| `api/` | API gateway and routing |
+| `microservices/` | Core business services |
 | `spring-cloud/` | Config server, discovery, gateway |
 | `keystore/` | TLS and OAuth/OIDC setup |
 | `util/` | OpenAPI specs and shared utilities |
@@ -29,88 +69,97 @@ This project demonstrates a secure, reactive microservices architecture using Sp
 
 ## 🔐 Security Architecture
 
-- OAuth 2.0 and OIDC integration via Spring Security
-- HTTPS enforced via keystore configuration
-- Token validation and role-based access control
-- Conditional access simulated via scopes and claims
+- OAuth 2.0 / OIDC integration via Spring Security  
+- Token validation at service boundaries  
+- Role-based access control using scopes and claims  
+- HTTPS enforced via keystore configuration  
 
 ---
 
-## 🧪 Testing & Deployment
+## 🧪 Testing Strategy
 
-- Unit and component tests
-- Bash scripts for microservice testing
-- Docker Compose files for RabbitMQ and Kafka
-- Kubernetes-ready structure (manifests not visible in root)
+Testing is structured across multiple layers to reflect real-world system validation:
+
+### Unit Tests
+- Validate core business logic in isolation  
+
+### Component Tests
+- Validate service-level behaviour with controlled dependencies  
+- Focus on API contracts and internal logic  
+
+### Integration Tests
+- Validate end-to-end flows via the API gateway  
+- Ensure correct interaction across services and messaging layers  
+
+### Key Focus Areas
+- Reactive flow validation (WebFlux)  
+- OAuth token validation and security boundaries  
+- Service interaction through Kafka and RabbitMQ  
+- Deterministic testing of asynchronous behaviour where possible  
+
+Tests are executed during build and CI workflows to provide fast and reliable feedback.
 
 ---
 
-## ✅ Automated Testing
-
-This project includes component and unit tests that run automatically with each build.
-
-### 🧪 To Run Tests Manually
+## 🧪 Running Tests
 
 ```bash
 ./gradlew test
-````
-
-Or, for a specific module:
+```
+For a specific module:
 
 ```bash
 ./gradlew :<module-name>:test
-````
-
-🛠️ Test Coverage
-- Unit tests for core business logic
-- Component tests for service interactions
-- Reactive flow validation (WebFlux)
-- OAuth token validation scenarios
-  Tests are triggered during build and CI workflows to ensure reliability across microservices.
+```
 
 ---
 
-## 🧪 Local Microservices Sanity Tests
+## 🧪 Local System Execution & Sanity Testing
 
-This project includes a test harness for running all microservices locally using Docker. The test script spins up the full stack via the `product-composite` gateway.
+A test harness is provided to run the full system locally using Docker.
 
-### ✅ Prerequisites
+### Prerequisites
+- Docker installed and running
+- Git
+- Bash (Linux/macOS or WSL)
 
-- Docker installed and running locally before executing the script
-- Git installed
-- Bash shell (Linux/macOS or WSL on Windows)
-- Logs and service health can be monitored via Docker Dashboard or docker ps
-- You may need to grant execute permissions to the script
-```bash
-chmod +x ./test-all-microservices-on-docker-via-product-composite-02.bash
-```
-
-### 📦 Clone the Repository
+### Clone Repository
 
 ```bash
 git clone https://github.com/kiduknott/akt-reactive-springboot-cloud-kubernetes-microservices-with-oauth.git
 cd akt-reactive-springboot-cloud-kubernetes-microservices-with-oauth
 ```
-
-### 🚀 Start All Microservices And Dependent Services And Run The Sanity Tests
+### Start System and Run Sanity Tests
 
 ```bash
 ./test-all-microservices-on-docker-via-product-composite-02.bash start
 ```
 
 This will:
-- Build and start all microservices using Docker
-- Route traffic through the  gateway
-- Initialise supporting services (e.g., RabbitMQ, Kafka)
+- Build and start all services
+- Route traffic through the API gateway
+- Initialise Kafka and RabbitMQ
+- Execute basic system-level validation
 
-### 🛑 Stop All Microservices
+### Stop System
 
 ```bash
 ./test-all-microservices-on-docker-via-product-composite-02.bash stop
 ```
 
-This will:
-- Gracefully shut down all containers
-- Clean up the test environment
+---
+
+## 🔍 How to Evaluate This Project
+
+To assess this project:
+1. Run the system using Docker
+2. Execute the test script
+3. Observe:
+- request flow through the API gateway
+- service interactions
+- messaging behaviour (Kafka/RabbitMQ)
+- system behaviour during startup/shutdown
+
+Focus on how the system behaves under interaction, not just individual endpoints.
 
 ---
