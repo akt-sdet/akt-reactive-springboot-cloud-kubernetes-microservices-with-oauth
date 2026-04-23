@@ -28,6 +28,44 @@ The focus is on **flow-based behaviour**, where requests propagate across servic
 
 ---
 
+## 🔄 Example Flow: Product Composite Request
+
+1. Client sends request to API Gateway (`/product-composite/{id}`)
+2. Gateway routes to product-composite service
+3. Service orchestrates:
+   - Product service (core data)
+   - Review service (user-generated data)
+   - Recommendation service (derived data)
+4. Some interactions are synchronous (REST), others asynchronous (via messaging)
+5. Final response is aggregated and returned to the client
+
+### Behavioural Considerations
+- Partial failures (e.g. review service unavailable)
+- Delayed message processing (eventual consistency)
+- Retry handling for transient failures
+
+---
+
+## 🧪 Testing This Flow
+
+This flow is validated across multiple layers:
+
+- Component tests:
+  Validate each service in isolation with controlled dependencies
+
+- Integration tests:
+  Validate orchestration via the API gateway
+
+- Messaging validation:
+  Ensure events are produced and consumed correctly
+
+### Key Assertions
+- Correct aggregation of responses
+- Graceful handling of partial failures
+- Consistent system state after retries or delays
+
+---
+
 ## ⚠️ System Behaviour & Failure Scenarios
 
 This project explores realistic distributed system concerns:
