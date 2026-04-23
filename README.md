@@ -83,6 +83,30 @@ These scenarios were used to understand:
 
 ---
 
+## ⚠️ Example Failure Scenario
+
+**Scenario:** Review service unavailable during a product composite request
+
+### Expected Behaviour
+- Product data is returned successfully  
+- Reviews are omitted or replaced with a default response  
+- The system remains responsive and does not fail the entire request  
+
+### What This Demonstrates
+- Service isolation (failure does not cascade)  
+- Graceful degradation of functionality  
+- Resilience at the API aggregation layer  
+
+### Testing Approach
+- Simulate service unavailability (e.g. stop review service or mock failure)
+- Execute composite request via API gateway
+- Assert:
+  - response is returned (no 5xx)
+  - product data is present
+  - review section reflects fallback behaviour
+
+---
+
 ## 🚀 Tech Stack
 
 - **Spring Boot (WebFlux)** — Reactive microservices  
